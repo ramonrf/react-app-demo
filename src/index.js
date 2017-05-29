@@ -2,6 +2,24 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+function MoveLabel(props) {
+  return (
+    <li key={props.move}>
+      <button onClick={() => props.onClick(props.move)}>{props.descritption}</button>
+    </li>
+  );
+}
+
+function BoldMoveLabel(props) {
+  return (
+    <li key={props.move}>
+      <button onClick={() => props.onClick(props.move)}>
+        <b>{props.descritption}</b>
+      </button>
+    </li>
+  );
+}
+
 function Square(props) {
   return (
     <button className="square" onClick={props.onClick}>
@@ -91,11 +109,17 @@ class Game extends React.Component {
       const descritption = move ?
         'Move (' + step.lastMovedPosition + ')' :
         'Game start';
-      return (
-        <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{descritption}</button>
-        </li>
-      );
+
+      if (move === this.state.stepNumber) {
+        return (
+          <BoldMoveLabel move={move} descritption={descritption} onClick={(move) => this.jumpTo(move)} />
+        );
+      }
+      else {
+        return (
+          <MoveLabel move={move} descritption={descritption} onClick={(move) => this.jumpTo(move)} />
+        );
+      }
     });
 
     let status;
