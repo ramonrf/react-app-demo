@@ -4,7 +4,7 @@ import './index.css';
 
 function MoveLabel(props) {
   return (
-    <li key={props.move}>
+    <li>
       <button onClick={() => props.onClick(props.move)}>{props.descritption}</button>
     </li>
   );
@@ -12,7 +12,7 @@ function MoveLabel(props) {
 
 function BoldMoveLabel(props) {
   return (
-    <li key={props.move}>
+    <li>
       <button onClick={() => props.onClick(props.move)}>
         <b>{props.descritption}</b>
       </button>
@@ -32,6 +32,7 @@ class Board extends React.Component {
   renderSquare(i) {
     return (
       <Square
+        key={i}
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
       />
@@ -46,7 +47,7 @@ class Board extends React.Component {
         cells.push(this.renderSquare(3 * i + j));
       }
       rows.push(
-        <div className="board-row">{cells}</div>
+        <div key={i} className="board-row">{cells}</div>
       );
     }
     return (
@@ -61,57 +62,105 @@ class Game extends React.Component {
     this.state = {
       history: [{
         squares: Array(9).fill(null),
+        moveNumber: 0,
       }],
       stepNumber: 0,
       xIsNext: true,
+      sortAsc: true,
     };
   }
 
   handleClick(i) {
     const history = this.state.history;
-    const current = history[this.state.stepNumber];
+    const currentIndex = this.state.sortAsc ? history.length - 1 : 0;
+    const current = history[currentIndex];
     const squares = current.squares.slice();
+    const sortAsc = this.state.sortAsc;
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
     squares[i] = this.state.xIsNext ? 'X' : 'O';
+
+    let newHistoryEntry = [{
+      squares: squares,
+      lastMovedPosition: [Math.floor(i / 3) + 1, i % 3 + 1],
+      moveNumber: history.length,
+    }];
+    let updatedHistory;
+    if (sortAsc) {
+      updatedHistory = history.concat(newHistoryEntry);
+    }
+    else {
+      updatedHistory = newHistoryEntry.concat(history);
+    }
+
     this.setState({
-      history: history.concat([{
-        squares: squares,
-        lastMovedPosition: [Math.floor(i / 3) + 1, i % 3 + 1],
-      }]),
+      history: updatedHistory,
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
+      sortAsc: this.state.sortAsc,
     });
   }
 
   jumpTo(step) {
+    const sortAsc = this.state.sortAsc;
     const history = this.state.history;
+    let newHistory;
+    let stepNumber;
+    if (sortAsc) {
+      newHistory = history.slice(0, step + 1);
+      stepNumber = newHistory[newHistory.length - 1].moveNumber;
+    }
+    else {
+      newHistory = history.slice(step);
+      stepNumber = newHistory[0].moveNumber;
+    }
     this.setState({
-      history: history.slice(0, step + 1),
-      stepNumber: step,
+      history: newHistory,
+      stepNumber: stepNumber,
       xIsNext: (step % 2) ? false : true,
+      sortAsc: sortAsc,
+    });
+  }
+
+  sortMoves() {
+    const history = this.state.history.slice();
+    const sortAsc = this.state.sortAsc;
+    if (sortAsc) {
+      history.sort((a, b) => b.moveNumber - a.moveNumber);
+    }
+    else {
+      history.sort((a, b) => a.moveNumber - b.moveNumber);
+    }
+    this.setState({
+      history: history,
+      stepNumber: this.state.stepNumber,
+      xIsNext: this.state.xIsNext,
+      sortAsc: !sortAsc,
     });
   }
 
   render() {
     const history = this.state.history;
-    const current = history[history.length - 1];
+    const currentIndex = this.state.sortAsc ? history.length - 1 : 0;
+    const current = history[currentIndex];
     const winner = calculateWinner(current.squares);
 
     const moves = history.map((step, move) => {
-      const descritption = move ?
+      const descritption = step.moveNumber ?
         'Move (' + step.lastMovedPosition + ')' :
         'Game start';
 
-      if (move === this.state.stepNumber) {
+      if (step.moveNumber === this.state.stepNumber) {
+        console.log(this.state.stepNumber);
+        console.log(this);
         return (
-          <BoldMoveLabel move={move} descritption={descritption} onClick={(move) => this.jumpTo(move)} />
+          <BoldMoveLabel key={move} move={move} descritption={descritption} onClick={(move) => this.jumpTo(move)} />
         );
       }
       else {
         return (
-          <MoveLabel move={move} descritption={descritption} onClick={(move) => this.jumpTo(move)} />
+          <MoveLabel key={move} move={move} descritption={descritption} onClick={(move) => this.jumpTo(move)} />
         );
       }
     });
@@ -133,6 +182,7 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
+          <div><button onClick={() => this.sortMoves()}>Sort Moves</button></div>
           <ol>{moves}</ol>
         </div>
       </div>
