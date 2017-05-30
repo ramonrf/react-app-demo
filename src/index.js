@@ -2,15 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import MoveLabel from './components/move-label';
 import BoldMoveLabel from './components/bold-move-label';
+import Square from './components/square';
 import './index.css';
-
-function Square(props) {
-  return (
-    <button className="square" onClick={props.onClick}>
-      {props.value}
-    </button>
-  );
-}
 
 class Board extends React.Component {
   renderSquare(i) {
