@@ -8,4 +8,4 @@ function MoveLabel(props) {
   );
 }
 
-export { MoveLabel };
+export default MoveLabel;

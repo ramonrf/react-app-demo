@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { MoveLabel } from './components/move-label';
+import MoveLabel from './components/move-label';
 import './index.css';
 
 function BoldMoveLabel(props) {
@@ -145,8 +145,6 @@ class Game extends React.Component {
         'Game start';
 
       if (step.moveNumber === this.state.stepNumber) {
-        console.log(this.state.stepNumber);
-        console.log(this);
         return (
           <BoldMoveLabel key={move} move={move} descritption={descritption} onClick={(move) => this.jumpTo(move)} />
         );
