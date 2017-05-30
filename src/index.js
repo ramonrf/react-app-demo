@@ -1,17 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import MoveLabel from './components/move-label';
+import BoldMoveLabel from './components/bold-move-label';
 import './index.css';
-
-function BoldMoveLabel(props) {
-  return (
-    <li>
-      <button onClick={() => props.onClick(props.move)}>
-        <b>{props.descritption}</b>
-      </button>
-    </li>
-  );
-}
 
 function Square(props) {
   return (
