@@ -41,12 +41,12 @@ class Game extends React.Component {
             updatedHistory = newHistoryEntry.concat(history);
         }
 
-        this.setState({
+        this.setState((prevState, props) => ({
             history: updatedHistory,
             stepNumber: history.length,
-            xIsNext: !this.state.xIsNext,
-            sortAsc: this.state.sortAsc,
-        });
+            xIsNext: !prevState.xIsNext,
+            sortAsc: prevState.sortAsc,
+        }));
     }
 
     jumpTo(step) {
@@ -79,12 +79,12 @@ class Game extends React.Component {
         else {
             history.sort((a, b) => a.moveNumber - b.moveNumber);
         }
-        this.setState({
+        this.setState((prevState, props) => ({
             history: history,
-            stepNumber: this.state.stepNumber,
-            xIsNext: this.state.xIsNext,
+            stepNumber: prevState.stepNumber,
+            xIsNext: prevState.xIsNext,
             sortAsc: !sortAsc,
-        });
+        }));
     }
 
     render() {
